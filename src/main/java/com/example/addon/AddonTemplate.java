@@ -23,7 +23,7 @@ public class AddonTemplate extends MeteorAddon {
         LOG.info("Initializing Meteor Addon Template");
 
         // Modules
-        Modules.get().add(new ModuleExample());
+        Modules.get().add(new RelapseChunkFinder());
 
         // Commands
         Commands.add(new CommandExample());

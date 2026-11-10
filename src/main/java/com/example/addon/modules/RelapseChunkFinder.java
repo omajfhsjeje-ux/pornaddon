@@ -11,11 +11,11 @@ import meteordevelopment.meteorclient.utils.render.RenderUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.GlowItemFrameEntity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.GlowItemFrame;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.level.ChunkPos;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -98,7 +98,7 @@ public class RelapseChunkFinder extends Module {
 
     public RelapseChunkFinder() {
         super(AddonTemplate.CATEGORY, "relapse-chunk-finder",
-      "Marks chunks containing item frames (normal / glow), optionally only underground.");
+            "Marks chunks containing item frames (normal / glow), optionally only underground.");
     }
 
     @Override
@@ -113,21 +113,21 @@ public class RelapseChunkFinder extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (mc.world == null) return;
+        if (mc.level == null) return;
         if (!remember.get()) found.clear();
 
-        for (Entity entity : mc.world.getEntities()) {
-            if (!(entity instanceof ItemFrameEntity frame)) continue;
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (!(entity instanceof ItemFrame frame)) continue;
 
-            boolean glow = frame instanceof GlowItemFrameEntity;
+            boolean glow = frame instanceof GlowItemFrame;
             if (glow && !glowFrames.get()) continue;
             if (!glow && !normalFrames.get()) continue;
 
-            BlockPos pos = frame.getBlockPos();
+            BlockPos pos = frame.blockPosition();
 
             if (undergroundOnly.get()) {
                 if (pos.getY() > maxY.get()) continue;
-                if (noSkyOnly.get() && mc.world.isSkyVisible(pos)) continue;
+                if (noSkyOnly.get() && mc.level.canSeeSky(pos)) continue;
             }
 
             long key = new ChunkPos(pos).toLong();
@@ -139,10 +139,10 @@ public class RelapseChunkFinder extends Module {
 
     @EventHandler
     private void onRender(Render3DEvent event) {
-        if (mc.world == null || found.isEmpty()) return;
+        if (mc.level == null || found.isEmpty()) return;
 
-        int bottom = mc.world.getBottomY();
-        int top = bottom + mc.world.getHeight();
+        int bottom = mc.level.getMinY();
+        int top = bottom + mc.level.getHeight();
 
         for (Map.Entry<Long, Entry> e : found.entrySet()) {
             ChunkPos cp = new ChunkPos(e.getKey());
@@ -152,7 +152,7 @@ public class RelapseChunkFinder extends Module {
             Color side = new Color(base.r, base.g, base.b, fillAlpha.get());
             Color line = new Color(base.r, base.g, base.b, lineAlpha.get());
 
-            double x1 = cp.getStartX(), z1 = cp.getStartZ();
+            double x1 = cp.getMinBlockX(), z1 = cp.getMinBlockZ();
             double x2 = x1 + 16, z2 = z1 + 16;
             double y1, y2;
 

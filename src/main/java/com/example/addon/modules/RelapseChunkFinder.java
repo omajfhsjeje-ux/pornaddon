@@ -1,6 +1,6 @@
-package com.relapse.debug.modules;
+package com.example.addon.modules;
 
-import com.relapse.debug.RelapseDebug;
+import com.example.addon.AddonTemplate;
 import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -97,8 +97,8 @@ public class RelapseChunkFinder extends Module {
     private final Map<Long, Entry> found = new HashMap<>();
 
     public RelapseChunkFinder() {
-        super(RelapseDebug.CATEGORY, "relapse-chunk-finder",
-            "Marks chunks containing item frames (normal / glow), optionally only underground.");
+        super(AddonTemplate.CATEGORY, "relapse-chunk-finder",
+      "Marks chunks containing item frames (normal / glow), optionally only underground.");
     }
 
     @Override
